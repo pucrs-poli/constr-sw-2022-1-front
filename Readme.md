@@ -2,14 +2,14 @@
 
 ## Grupos
 
-| Grupo | Frontend
---------|---------
-| 1     | reservas
-| 2     | aulas e conteudos
-| 3     | cursos,curriculos e disciplinas
-| 4     | predios e salas
-| 5     | turmas e alunos
-| 6     | tipos de recursos e recursos
+| Grupo | Frontend                         | Repo de backend
+--------|----------------------------------|---------------------------
+| 1     | reservas                         | [https://github.com/pucrs-poli/constr-sw-2022-1-g3](https://github.com/pucrs-poli/constr-sw-2022-1-g3)
+| 2     | aulas e conteudos                | [https://github.com/pucrs-poli/constr-sw-2022-1-g5](https://github.com/pucrs-poli/constr-sw-2022-1-g5)
+| 3     | cursos,curriculos e disciplinas  | [https://github.com/pucrs-poli/constr-sw-2022-1-g6](https://github.com/pucrs-poli/constr-sw-2022-1-g6)
+| 4     | predios e salas                  | [https://github.com/pucrs-poli/constr-sw-2022-1-g1](https://github.com/pucrs-poli/constr-sw-2022-1-g1)
+| 5     | turmas e alunos                  | [https://github.com/pucrs-poli/constr-sw-2022-1-g2](https://github.com/pucrs-poli/constr-sw-2022-1-g2)
+| 6     | tipos de recursos e recursos     | [https://github.com/pucrs-poli/constr-sw-2022-1-g4](https://github.com/pucrs-poli/constr-sw-2022-1-g4)
 
 ## Mockups
 
