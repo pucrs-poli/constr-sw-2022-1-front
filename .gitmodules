@@ -1,5 +1,5 @@
 [submodule "reservas"]
-	path = backend/reservas
+	path = backend/reservations
 	url = https://github.com/pucrs-poli/constr-sw-2022-1-g3
 	branch = main
 [submodule "salas"]
@@ -7,7 +7,7 @@
 	url = https://github.com/pucrs-poli/constr-sw-2022-1-g1
 	branch = main
 [submodule "turmas"]
-	path = backend/turmas
+	path = backend/classes
 	url = https://github.com/pucrs-poli/constr-sw-2022-1-g2
 	branch = main
 [submodule "recursos"]
@@ -19,6 +19,30 @@
 	url = https://github.com/pucrs-poli/constr-sw-2022-1-g6
 	branch = main
 [submodule "aulas"]
-	path = aulas
+	path = backend/aulas
 	url = https://github.com/pucrs-poli/constr-sw-2022-1-g5
+	branch = main
+[submodule "buildings"]
+	path = backend/buildings
+	url = https://github.com/pucrs-poli/constr-sw-2022-1-g1
+	branch = main
+[submodule "classes"]
+	path = backend/classes
+	url = https://github.com/pucrs-poli/constr-sw-2022-1-g2
+	branch = main
+[submodule "reservations"]
+	path = backend/reservations
+	url = https://github.com/pucrs-poli/constr-sw-2022-1-g3
+	branch = main
+[submodule "resources"]
+	path = backend/resources
+	url = https://github.com/pucrs-poli/constr-sw-2022-1-g4
+	branch = master
+[submodule "lessons"]
+	path = backend/lessons
+	url = https://github.com/pucrs-poli/constr-sw-2022-1-g5
+	branch = master
+[submodule "courses"]
+	path = backend/courses
+	url = https://github.com/pucrs-poli/constr-sw-2022-1-g6
 	branch = main
