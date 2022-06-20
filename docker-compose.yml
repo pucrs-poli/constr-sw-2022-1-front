@@ -38,5 +38,3 @@ services:
       SWAGGER_JSON: /swagger.yml
     networks:
       constrsw:
-volumes:
-  mongo:
