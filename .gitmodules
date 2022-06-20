@@ -18,3 +18,7 @@
 	path = backend/disciplinas
 	url = https://github.com/pucrs-poli/constr-sw-2022-1-g6
 	branch = main
+[submodule "aulas"]
+	path = aulas
+	url = https://github.com/pucrs-poli/constr-sw-2022-1-g5
+	branch = main
