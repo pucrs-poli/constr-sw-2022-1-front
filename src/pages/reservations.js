@@ -1,8 +1,10 @@
 import Button from "../components/CustomButtonComponent";
+// import "../styles/reservations.css"
 
 export default function Reservations() {
     return (
       <>
+        <div className="full-screenable-node" />
         <h1>Colorful Custom Button Components</h1>
         <Button 
           border="none"
