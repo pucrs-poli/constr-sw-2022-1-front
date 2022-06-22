@@ -78,10 +78,14 @@ services:
     # restart: unless-stopped
     ports:
       - 8000:8084
+    environment:
+      - MONGODB_PORT=27017
+      - MONGODB_USERNAME=root
+      - MONGODB_PASSWORD=Ab12345678
     networks:
       - constrsw
     depends_on:
-      - postgres
+      - mongodb
   lessons: # Grupo 5
     container_name: lessons
     build: ./backend/lessons
