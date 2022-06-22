@@ -14,11 +14,3 @@
 	path = backend/resources
 	url = https://github.com/pucrs-poli/constr-sw-2022-1-g4
 	branch = master
-[submodule "lessons"]
-	path = backend/lessons
-	url = https://github.com/pucrs-poli/constr-sw-2022-1-g5
-	branch = master
-[submodule "courses"]
-	path = backend/courses
-	url = https://github.com/pucrs-poli/constr-sw-2022-1-g6
-	branch = main
