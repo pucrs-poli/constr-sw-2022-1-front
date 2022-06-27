@@ -1,10 +1,8 @@
 import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Button from "../components/CustomButtonComponent";
 import styled from 'styled-components';
+import CustomAppBar from '../components/CustomAppBar';
 
 export const Container = styled.div`
   height: 300px;
@@ -18,15 +16,7 @@ export const Container = styled.div`
 export default function Reservations() {
   return (
     <>
-      <AppBar position="static">
-        <Toolbar variant="dense">
-          <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
-          </IconButton>
-          <Typography variant="h6" color="inherit" component="div">
-            Reservations
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <CustomAppBar title="Construção de Software" />
       <Container>
         <Typography variant="h6" color="inherit" component="div">
           Selecione sua sala
