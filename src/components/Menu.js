@@ -6,7 +6,24 @@ const Menu = () =>{
                     <a id="menu-label">MENU</a>
                 </Grid>
                 <Grid>
-                    s
+                    <h6>
+                        <a href="/classes">Aulas</a>
+                    </h6>
+                </Grid>
+                <Grid>
+                    <h6>
+                        <a href="/courses">Turma</a>
+                    </h6>
+                </Grid>
+                <Grid>
+                    <h6>
+                        <a href="/buildings">Prédios</a>
+                    </h6>
+                </Grid>
+                <Grid>
+                    <h6>
+                        <a href="/reservations">Recursos</a>
+                    </h6>
                 </Grid>
             </Grid>
 };
