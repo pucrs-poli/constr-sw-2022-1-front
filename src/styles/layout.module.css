@@ -5,18 +5,3 @@
         "navbar content";
     grid-template-columns: 1fr 4fr;
 }
-
-.content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    grid-area: "content";
-    background-color: #dbf9fc;
-}
-
-.tmp-nav {
-    align-items: center;
-    justify-content: center;
-    grid-area: "sidebar";
-    background-color: brown;
-}
