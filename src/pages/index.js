@@ -1,5 +1,8 @@
-export default function Home() {
+import Home from "./home";  
+
+
+export default function Index() {
   return (
-    <h1>Hello world!</h1>
+    <div> <Home /> </div>
   )
 }
