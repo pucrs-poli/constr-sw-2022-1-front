@@ -2,39 +2,129 @@ version: '3.4'
 networks:
   constrsw:
 services:
-  mongodb-lessons:
-    container_name: mongodb=lessons
+  mongodb:
+    container_name: mongodb
     image: mongo:latest
     ports:
       - 27017:27017
     environment:
-      MONGO_INITDB_DATABASE: "lessons"
-      MONGO_INITDB_ROOT_USERNAME: "root"
-      MONGO_INITDB_ROOT_PASSWORD: "Ab12345678"
+      - MONGO_INITDB_DATABASE=db
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=Ab12345678
     volumes:
-      - ./backend/lessons/mongodb-data:data/db
+      - ./backend/lessons/mongodb-data:/data/db
     networks:
-      constrsw:
-  lessons:
-    container_name: 'lessons'
-    build: .
-    environment:
-      spring.data.mongodb.uri: 'mongodb://root:Ab12345678@mongodb:27017/lessons?authSource=admin'
-      server.port: 8085
+      - constrsw
+  postgres:
+    container_name: postgres
+    image: postgres:latest
     ports:
-      - 8085:8085
+      - 5432:5432
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_PORT=5432
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=Ab12345678
+    volumes:
+      - ./backend/lessons/mongodb-data:/data/db
     networks:
-      constrsw:
+      - constrsw
+  buildings: # Grupo 1
+    container_name: buildings
+    build: ./backend/buildings
+    volumes:
+      - /data/springboot-docker-compose-app
+    ports:
+      - 8080:8081
+    environment:
+      - MONGODB_PORT=27017
+      - MONGODB_USERNAME=root
+      - MONGODB_PASSWORD=Ab12345678
+    networks:
+      - constrsw
     depends_on:
-      - mongodb-lessons
-  swagger-lessons:
-    container_name: swagger-lessons
-    image: swaggerapi/swagger-ui
-    volumes:
-      - ./swagger.yml:/swagger.yml
+      - mongodb
+  classes: # Grupo 2
+    container_name: classes
+    build: ./backend/classes/P2
     ports:
-      - 8080:8080
+      - 8000:8082
     environment:
-      SWAGGER_JSON: /swagger.yml
+      - DB_HOST=localhost:5432
+      - DB_USER=admin
+      - DB_PASSWORD=1234
+      - POSTGRES_PORT=5432
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=Ab12345678
     networks:
-      constrsw:
+      - constrsw
+    depends_on:
+      - postgres
+  reservations: # Grupo 3
+    container_name: reservations
+    build: ./backend/reservations
+    ports:
+      - 8001:8083
+    networks:
+      - constrsw
+    depends_on:
+      - mongodb
+  resources: # Grupo 4
+    container_name: resources
+    build:
+      context: ./backend/resources
+      dockerfile: Api.Dockerfile
+    # restart: unless-stopped
+    ports:
+      - 8000:8084
+    environment:
+      - MONGODB_PORT=27017
+      - MONGODB_USERNAME=root
+      - MONGODB_PASSWORD=Ab12345678
+    networks:
+      - constrsw
+    depends_on:
+      - mongodb
+  lessons: # Grupo 5
+    container_name: lessons
+    build: ./backend/lessons
+    ports:
+      - 8082:8084
+    environment:
+      - server.port=8082
+      - MONGO_PORT=27017
+      - MONGO_USERNAME=root
+      - MONGO_PASSWORD=Ab12345678
+    networks:
+      - constrsw
+    depends_on:
+      - mongodb
+  courses: # Grupo 6
+    container_name: courses
+    build: ./backend/courses
+    image: disciplinas:latest
+    ports:
+      - 8080:8086
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=Ab12345678
+    networks:
+      - constrsw
+    depends_on:
+      - postgres
+  # swagger-lessons:
+  #   container_name: swagger-lessons
+  #   image: swaggerapi/swagger-ui
+  #   volumes:
+  #     - ./swagger.yml:/swagger.yml
+  #   ports:
+  #     - 8080:8080
+  #   environment:
+  #     SWAGGER_JSON: /swagger.yml
+  #   networks:
+  #     constrsw:
