@@ -1,10 +1,11 @@
 import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
+
 import Typography from '@mui/material/Typography';
+import HeadTitle from "../components/HeadTitle";
 import Button from "../components/CustomButtonComponent";
+import Menu from "../components/Menu";
 import styled from 'styled-components';
+import Paper from '@mui/material/Paper';
 
 export const Container = styled.div`
   height: 300px;
@@ -15,22 +16,20 @@ export const Container = styled.div`
   background-color: #D3D3D3;
 `;
 
+export const Item = styled(Paper)(() => ({
+  padding: 1,
+  textAlign: 'center',
+}));
+
 export default function Reservations() {
   return (
     <>
-      <AppBar position="static">
-        <Toolbar variant="dense">
-          <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
-          </IconButton>
-          <Typography variant="h6" color="inherit" component="div">
-            Reservations
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <HeadTitle/>
       <Container>
-        <Typography variant="h6" color="inherit" component="div">
+        <Typography variant="h6" component="div">
           Selecione sua sala
         </Typography>
+        <Menu/>
       </Container>
       <h1>Colorful Custom Button Components</h1>
       <Button

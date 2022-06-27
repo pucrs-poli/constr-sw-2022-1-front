@@ -14,3 +14,22 @@ a {
 * {
   box-sizing: border-box;
 }
+#menu-label{
+  color: #999999;
+  font-size: 14px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  border: none;
+}
+#grid-menu{
+  width: 148px;
+  margin: 0px;
+}
+
+#grid-menu > div{
+  margin-left: 16px;
+}
+
+.MuiToolbar-root{
+  justify-content: center;
+}
