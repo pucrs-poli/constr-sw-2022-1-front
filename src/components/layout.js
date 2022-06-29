@@ -3,9 +3,9 @@ import Header from "./HeadTitle";
 import Menu from "./Menu";
 
 
-export default function Layout({ children }) {
+export default function Layout({ children, ...props }) {
     return (
-        <div className={styles.layout}>
+        <div className={styles.layout} {...props}>
             <div style={{ gridArea: "header" }}>
                 <Header />
             </div>
