@@ -3,8 +3,11 @@ import React from 'react';
 import CustomAppBar from '../../components/CustomAppBar';
 import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
 
-import CircularProgress from '@mui/material/CircularProgress';
 import LoadingModal from '../../components/modals/LoadingModal';
+import ClassModel from '../../models/Class';
+import DisciplineModel from '../../models/Discipline';
+import StudentModel from '../../models/Student';
+import { ClassesRepository } from '../../remote/repositories/classes-repository';
 export default class EditStudent extends React.Component {
 
   constructor(props) {
@@ -18,75 +21,80 @@ export default class EditStudent extends React.Component {
     this.addSelectedStudentToList = this.addSelectedStudentToList.bind(this);
     this.openCloseModal = this.openCloseModal.bind(this);
     this.showHideLoadingInModal = this.showHideLoadingInModal.bind(this);
-    this.mockData = {
-      id: '098',
-      imagePath: 'frontend.png',
-      discipline: {
-        id: '123',
-        name: 'Construção de Software'
-      },
-      schedule: {
-        id: '321',
-        hour: 'JK'
-      },
-      teacher: {
-        id: '809',
-        name: 'Eduardo Arruda'
-      },
-      resource: {
-        id: 'res-123',
-        name: 'Auditório - 516'
-      },
-      students: [
-        // {
-        //   name: "Kevin",
-        //   student_id: "caa6154b-03e3-45b2-820d-aa548030af3e",
-        //   enrollment: "16204042"
-        // },
-        {
-          name: "Rodrigo",
-          student_id: "caa6154c-03e3-45b2-820d-aa548030af3e",
-          enrollment: "16204042"
-        },
-        {
-          name: "Diego",
-          student_id: "caa6154d-03e3-45b2-820d-aa548030af3e",
-          enrollment: "16204042"
-        },
-        {
-          name: "Edson",
-          student_id: "caa6154e-03e3-45b2-820d-aa548030af3e",
-          enrollment: "16204042"
-        },
-        {
-          name: "Ricardo",
-          student_id: "caa6154f-03e3-45b2-820d-aa548030af3e",
-          enrollment: "16204042"
-        },
-        {
-          name: "Taylor",
-          student_id: "caa6154g-03e3-45b2-820d-aa548030af3e",
-          enrollment: "16204042"
-        },
-        {
-          name: "Alex",
-          student_id: "caa6154h-03e3-45b2-820d-aa548030af3e",
-          enrollment: "16204042"
-        },
-        {
-          name: "Michel",
-          student_id: "caa6154i-03e3-45b2-820d-aa548030af3e",
-          enrollment: "16204042"
-        },
-        {
-          name: "Tiago",
-          student_id: "caa6154j-03e3-45b2-820d-aa548030af3e",
-          enrollment: "16204042"
-        }
-      ],
-      year: 2022,
-      semester: 2
-    };
+
+    this.classesRepository = new ClassesRepository();
+
+
+
+    // this.mockData? = {
+    //   id: '098',
+    //   imagePath: 'frontend.png',
+    //   discipline: {
+    //     id: '123',
+    //     name: 'Construção de Software'
+    //   },
+    //   schedule: {
+    //     id: '321',
+    //     hour: 'JK'
+    //   },
+    //   teacher: {
+    //     id: '809',
+    //     name: 'Eduardo Arruda'
+    //   },
+    //   resource: {
+    //     id: 'res-123',
+    //     name: 'Auditório - 516'
+    //   },
+    //   students: [
+    //     // {
+    //     //   name: "Kevin",
+    //     //   student_id: "caa6154b-03e3-45b2-820d-aa548030af3e",
+    //     //   enrollment: "16204042"
+    //     // },
+    //     {
+    //       name: "Rodrigo",
+    //       student_id: "caa6154c-03e3-45b2-820d-aa548030af3e",
+    //       enrollment: "16204042"
+    //     },
+    //     {
+    //       name: "Diego",
+    //       student_id: "caa6154d-03e3-45b2-820d-aa548030af3e",
+    //       enrollment: "16204042"
+    //     },
+    //     {
+    //       name: "Edson",
+    //       student_id: "caa6154e-03e3-45b2-820d-aa548030af3e",
+    //       enrollment: "16204042"
+    //     },
+    //     {
+    //       name: "Ricardo",
+    //       student_id: "caa6154f-03e3-45b2-820d-aa548030af3e",
+    //       enrollment: "16204042"
+    //     },
+    //     {
+    //       name: "Taylor",
+    //       student_id: "caa6154g-03e3-45b2-820d-aa548030af3e",
+    //       enrollment: "16204042"
+    //     },
+    //     {
+    //       name: "Alex",
+    //       student_id: "caa6154h-03e3-45b2-820d-aa548030af3e",
+    //       enrollment: "16204042"
+    //     },
+    //     {
+    //       name: "Michel",
+    //       student_id: "caa6154i-03e3-45b2-820d-aa548030af3e",
+    //       enrollment: "16204042"
+    //     },
+    //     {
+    //       name: "Tiago",
+    //       student_id: "caa6154j-03e3-45b2-820d-aa548030af3e",
+    //       enrollment: "16204042"
+    //     }
+    //   ],
+    //   year: 2022,
+    //   semester: 2
+    // };
 
     this.mockStudentsData = [
       {
@@ -191,19 +199,46 @@ export default class EditStudent extends React.Component {
       },
     ];
 
-    this.state = {
-      controls: {
-        selectedStudentId: '',
-        modalSave: {
-          isLoading: false,
-          isOpen: false
+  }
+
+  componentDidMount() {
+    this.classesRepository.fetchAllClasses().then(data => {
+      this.mockData = data.map(d => {
+        const clazz = new ClassModel();
+        clazz.id = d.class_id;
+        clazz.year = d.year;
+        clazz.semester = d.semester;
+        clazz.students = d.students.map(s => {
+          const student = new StudentModel();
+          student.id = s.student_id;
+          student.name = s.name;
+          student.enrollment = s.enrollment;
+
+          return student;
+        });
+
+        const discipline = new DisciplineModel();
+        discipline.id = d.id_discipline;
+
+        clazz.discipline = discipline;
+        return clazz;
+      });
+
+
+      this.state = {
+        controls: {
+          selectedStudentId: '',
+          modalSave: {
+            isLoading: false,
+            isOpen: false
+          }
+        },
+        data: this.mockData,
+        modal: {
+          opened: false
         }
-      },
-      data: this.mockData,
-      modal: {
-        opened: false
-      }
-    };
+      };
+    });
   }
 
   render = () => (
@@ -213,7 +248,7 @@ export default class EditStudent extends React.Component {
         <Grid container width={'80%'} margin={'auto'}>
           <Grid item sm={12} sx={{ textAlign: 'center' }}>
             <Typography color="inherit" component="span" variant={'h4'}>
-              {this.mockData.discipline.name} {`${this.mockData.year}/${this.mockData.semester}`}
+              {this.mockData?.discipline.name} {`${this.mockData?.year}/${this.mockData?.semester}`}
             </Typography>
 
           </Grid>
@@ -224,7 +259,7 @@ export default class EditStudent extends React.Component {
             <Select
               labelId="id-teacher"
               id="id-teacher"
-              value={this.mockData.teacher.id}
+              value={this.mockData?.teacher.id}
               onChange={this.handleChangeTeacher}
               fullWidth
             >
@@ -239,7 +274,7 @@ export default class EditStudent extends React.Component {
             {/* <Select
               labelId="id-schedule"
               id="id-schedule"
-              value={this.mockData.schedule.id}
+              value={this.mockData?.schedule.id}
               onChange={this.handleChangeSchedule}
               fullWidth
             > */}
@@ -247,7 +282,7 @@ export default class EditStudent extends React.Component {
               this.mockHoursData.map((d, indx) =>
                 <FormControlLabel key={indx}
                   control={
-                    <Checkbox key={d} value={d} checked={this.mockData.schedule.hour.toUpperCase().indexOf(d) != -1} />
+                    <Checkbox key={d} value={d} checked={this.mockData?.schedule.hour.toUpperCase().indexOf(d) != -1} />
                   }
                   label={d} />)
             }
@@ -260,7 +295,7 @@ export default class EditStudent extends React.Component {
             <Select
               labelId="id-resource"
               id="id-resource"
-              value={this.mockData.resource.id}
+              value={this.mockData?.resource.id}
               onChange={this.handleChangeResource}
               fullWidth
             >
@@ -281,12 +316,12 @@ export default class EditStudent extends React.Component {
                 <Select
                   labelId="id-student-select"
                   id="id-student-select"
-                  value={this.state.controls.selectedStudentId}
+                  value={this.state?.controls.selectedStudentId}
                   onChange={this.handleChangeStudent}
                   fullWidth
                 >
                   {
-                    this.mockStudentsData.filter(s => !this.state.data.students.map(sMock => sMock.enrollment).includes(s.enrollment)).map(d => <MenuItem key={d.student_id} value={d.student_id}>{d.name} - {d.enrollment}</MenuItem>)
+                    this.mockStudentsData.filter(s => !this.state?.data.students.map(sMock => sMock.enrollment).includes(s.enrollment)).map(d => <MenuItem key={d.student_id} value={d.student_id}>{d.name} - {d.enrollment}</MenuItem>)
                   }
                 </Select>
               </Grid>
@@ -316,7 +351,7 @@ export default class EditStudent extends React.Component {
         </Grid>
       </Container>
 
-      <LoadingModal open={this.state.controls.modalSave.isOpen} openCloseModal={this.openCloseModal} isLoading={this.state.controls.modalSave.isLoading} messageAfterLoaded={'Turma sava com sucesso!'} />
+      <LoadingModal open={this.state?.controls.modalSave.isOpen} openCloseModal={this.openCloseModal} isLoading={this.state?.controls.modalSave.isLoading} messageAfterLoaded={'Turma sava com sucesso!'} />
 
     </>
   );
@@ -351,8 +386,8 @@ export default class EditStudent extends React.Component {
   }
 
   addSelectedStudentToList() {
-    const newStudent = this.mockStudentsData.find(s => s.student_id == this.state.controls.selectedStudentId);
-    this.mockData.students.push(newStudent);
+    const newStudent = this.mockStudentsData.find(s => s.student_id == this.state?.controls.selectedStudentId);
+    this.mockData?.students.push(newStudent);
 
     const currentState = this.state;
     currentState.data = this.mockData;
@@ -360,7 +395,7 @@ export default class EditStudent extends React.Component {
   }
 
   removeStudentFromClass(studentId) {
-    this.mockData.students = this.mockData.students.filter(s => s.student_id != studentId);
+    this.mockData.students = this.mockData?.students.filter(s => s.student_id != studentId);
     const currentState = this.state;
     currentState.data = this.mockData;
     this.setState(currentState);
@@ -389,12 +424,12 @@ export default class EditStudent extends React.Component {
       }}
       >
         {
-          this.state.data?.students.map((s, indx) => {
+          this.state?.data?.students.map((s, indx) => {
             return (
               <ListItem secondaryAction={
                 <ConfirmDeleteModal title={`Remover aluno`} description={
                   <span>
-                    <span>Deseja realmente remove o aluno  <b>{s.name}</b> da turma de {this.mockData.discipline.name}?</span>
+                    <span>Deseja realmente remove o aluno  <b>{s.name}</b> da turma de {this.mockData?.discipline.name}?</span>
                   </span>
                 }
                   positiveCallback={() => this.removeStudentFromClass(s.student_id)}
