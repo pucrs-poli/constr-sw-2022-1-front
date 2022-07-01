@@ -5,6 +5,7 @@ import CustomAppBar from '../../components/CustomAppBar';
 import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
 import LoadingModal from '../../components/modals/LoadingModal';
 
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ClassModel from '../../models/Class';
 import DisciplineModel from '../../models/Discipline';
 import ScheduleModel from '../../models/Schedule';
@@ -20,13 +21,7 @@ export default function EditStudent(props) {
   const studentsRepository = new StudentsRepository();
 
   const [controls, setControls] = useState({ modalSave: { isOpen: false, isLoading: false }, selectedStudentId: '' });
-
-
-  const [classData, setClassData] = useState({
-    id: '0',
-    imagePath: ''
-  });
-
+  const [classData, setClassData] = useState(new ClassModel());
   const [disciplineData, setDisciplineData] = useState({
     id: '0',
     name: ''
@@ -52,7 +47,6 @@ export default function EditStudent(props) {
     },
   ]);
 
-
   const [allStudents, setAllStudents] = useState([
     {
       name: "",
@@ -60,7 +54,6 @@ export default function EditStudent(props) {
       enrollment: ""
     }
   ]);
-
 
   const mockTeachersData = [
     {
@@ -105,59 +98,58 @@ export default function EditStudent(props) {
     }
 
     classesRepository.fetchClassById(router.query.classId).then(responseData => {
-      const clazz = new ClassModel();
-      clazz.id = responseData.class_id;
-      clazz.year = responseData.year;
-      clazz.semester = responseData.semester;
+      disciplinesRepository.fetchById(responseData.id_discipline).then(discData => {
+        studentsRepository.fetchAll().then(stData => {
 
-      const students = responseData.students.map(s => {
-        const student = new StudentModel();
-        student.id = s.student_id;
-        student.name = s.name;
-        student.enrollment = s.enrollment;
+          const clazz = new ClassModel();
+          clazz.id = responseData.class_id;
+          clazz.year = responseData.year;
+          clazz.semester = responseData.semester;
 
-        return student;
-      });
+          const students = responseData.students.map(s => {
+            const student = new StudentModel();
+            student.id = s.student_id;
+            student.name = s.name;
+            student.enrollment = s.enrollment;
 
-      const teacher = mockTeachersData.find(teach => teach.id == responseData.id_user);
+            return student;
+          });
 
-      const schedules = responseData.schedules.map(sch => {
-        const schedule = new ScheduleModel();
-        schedule.id = sch.id;
-        schedule.hour = sch.hour;
+          const teacher = mockTeachersData.find(teach => teach.id == responseData.id_user);
 
-        return schedule;
-      });
+          const schedules = responseData.schedules.map(sch => {
+            const schedule = new ScheduleModel();
+            schedule.id = sch.schedule_id;
+            schedule.hour = sch.hour;
 
-      disciplinesRepository.fetchById(responseData.id_discipline).then(data => {
-        const discipline = new DisciplineModel();
-        discipline.id = data.id;
-        discipline.name = data.nome;
+            return schedule;
+          });
 
-        setDisciplineData(discipline);
-      });
+          const discipline = new DisciplineModel();
+          discipline.id = discData.id;
+          discipline.name = discData.nome;
 
+          const foundStudents = stData.filter(s => !students.find(s2 => s2.id == s.student_id)).map(d => {
+            const s = new StudentModel();
 
-      studentsRepository.fetchAll().then(data => {
-        const foundStudents = data.map(d => {
-          const s = new StudentModel();
+            s.id = d.student_id;
+            s.name = d.name;
+            s.enrollment = d.enrollment;
 
-          s.id = d.student_id;
-          s.name = d.name;
-          s.enrollment = d.enrollment;
+            return s;
+          });
 
-          return s;
+          clazz.schedules = schedules;
+          clazz.students = students;
+
+          setDisciplineData(discipline);
+          setAllStudents(foundStudents);
+          setClassData(clazz);
+          setStudentsData(students);
+          setTeacherData(teacher);
+          setSchedulesData(schedules);
         });
-
-
-        setAllStudents(foundStudents);
-      })
-
-      setClassData(clazz);
-      setStudentsData(students);
-      setTeacherData(teacher);
-      setSchedulesData(schedules);
-
+      });
     });
 
 
@@ -198,6 +190,10 @@ export default function EditStudent(props) {
   }
 
   const addSelectedStudentToList = () => {
+    if (!controls.selectedStudentId) {
+      return;
+    }
+
     const newStudent = allStudents.find(s => s.id == controls.selectedStudentId);
     const updatedStudents = [];
 
@@ -207,6 +203,12 @@ export default function EditStudent(props) {
     });
 
     const newMockData = allStudents.filter(s => s.id != controls.selectedStudentId);
+
+    setControls({
+      modalSave: controls.modalSave,
+      selectedStudentId: ''
+    })
+
     setAllStudents(newMockData);
     setStudentsData(updatedStudents);
   }
@@ -228,11 +230,50 @@ export default function EditStudent(props) {
       },
       selectedStudentId: controls.selectedStudentId
     });
+
+    router.push('/classes');
   }
 
-  const showHideLoadingInModal = (isLoading) => {
-    controls.modalSave.isLoading = isLoading;
-    setControls(controls);
+  const saveClass = () => {
+    classData.discipline = disciplineData;
+    classData.teacher = teacherData;
+
+    setControls({
+      modalSave: {
+        isOpen: true,
+        isLoading: true
+      }
+    });
+
+    classesRepository.updateById(classData.id, classData).then(() => {
+      Promise.all([
+        classData.schedules.length > 0 ? classesRepository.deleteAllSchedulesFromClass(classData.id) : Promise.resolve(),
+        classData.students.length > 0 ? classesRepository.deleteAllStudentsFromClass(classData.id) : Promise.resolve()
+      ]).then(() => {
+
+        const promisesSchedules = schedulesData.map(sch => classesRepository.addScheduleToClass(classData.id, {
+          class_id: classData.id,
+          hour: sch.hour,
+          week_day: sch.hour
+        }));
+
+        const promisesStudents = studentsData.map(sch => classesRepository.linkStudentWithClass(classData.id, sch.id));
+
+        Promise.all(promisesSchedules.concat(promisesStudents)).then(d => {
+          setControls({
+            modalSave: {
+              isOpen: true,
+              isLoading: false,
+            }
+          });
+        }).catch(() => setControls({
+          modalSave: {
+            isOpen: true,
+            isLoading: false,
+          }
+        }));
+      });
+    });
   }
 
   const mountStudentList = () => {
@@ -285,6 +326,12 @@ export default function EditStudent(props) {
       <CustomAppBar title="Construção de Software" />
       <Container sx={{ marginTop: '50px' }}>
         <Grid container width={'80%'} margin={'auto'}>
+          <span style={{ cursor: 'pointer', marginBottom: '3rem' }} onClick={() => router.push('/classes')}>
+            <ArrowBackIcon sx={{ fontSize: '24pt', color: '#1976d2' }} />
+            <Typography color="#1976d2" component="span" sx={{ fontSize: '18pt', verticalAlign: 'bottom' }} >
+              voltar
+            </Typography>
+          </span>
           <Grid item sm={12} sx={{ textAlign: 'center' }}>
             <Typography color="inherit" component="span" variant={'h4'}>
               {disciplineData.name} {`${classData.year}/${classData.semester}`}
@@ -347,23 +394,7 @@ export default function EditStudent(props) {
           </Grid>
           <Grid item sm={12} marginTop={'5rem'} marginBottom={'5rem'}>
             <Grid item sm={12} sx={{ marginTop: '10px', textAlign: 'right' }}>
-              <Button variant="contained" onClick={() => {
-                setControls({
-                  modalSave: {
-                    isOpen: true,
-                    isLoading: true
-                  }
-                });
-
-                setTimeout(() => {
-                  setControls({
-                    modalSave: {
-                      isOpen: true,
-                      isLoading: false
-                    }
-                  });
-                }, 5000);
-              }}>Salvar</Button>
+              <Button variant="contained" onClick={saveClass}>Salvar</Button>
             </Grid>
           </Grid>
         </Grid>

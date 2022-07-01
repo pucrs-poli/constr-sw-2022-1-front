@@ -1,5 +1,3 @@
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import { Divider, Grid, Modal, Typography } from "@mui/material";
 import React from "react";
 
@@ -69,7 +67,7 @@ export default class CustomDataTable extends React.Component {
 
                         ) :
 
-                            <Grid item md={this.props.headers[indxTxt].columnSize} key={`${indxTxt} - grid-body-text`} >
+                            <Grid item md={this.props.headers[indxTxt].columnSize} key={`${indxTxt} - grid-body-text`} sx={{ wordBreak: 'break-all' }}>
                                 <Typography color="inherit" component="div" fontSize={'12pt'} key={`${indxTxt} - typography`}>
                                     {txt}
                                 </Typography>

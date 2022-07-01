@@ -9,7 +9,6 @@ export default class ClassModel {
     schedules = [
         {
             id: '',
-
             hour: ''
         }
     ];

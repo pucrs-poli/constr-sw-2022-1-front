@@ -8,4 +8,10 @@ export class DisciplinesRepository {
 
         return axiosResponse.data;
     }
+
+    fetchAll = async () =>{
+        const axiosResponse = await customAxios.get(`${nextConfig.env.DISCIPLINES_API_BASE_URL}/disciplinas`);
+
+        return axiosResponse.data;
+    }
 }
