@@ -6,17 +6,15 @@ export default class ClassModel {
         name: ''
     };
 
-    schedule = {
-        id: '',
-        hour: ''
-    };
+    schedules = [
+        {
+            id: '',
+
+            hour: ''
+        }
+    ];
 
     teacher = {
-        id: '',
-        name: ''
-    };
-
-    resource = {
         id: '',
         name: ''
     };
