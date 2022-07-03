@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Layout from '../components/layout';
+import { ConfirmModal } from '../components/ConfirmModal';
 import {
   Table,
   TableBody,
@@ -15,9 +16,15 @@ import {
   Grid,
   Snackbar,
   Alert,
-  Text
+  Dialog,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
-import { Add, DeleteOutline } from '@mui/icons-material';
+import { Add, DeleteOutline, ModeEditOutline } from '@mui/icons-material';
 
 function createData(name, type, description, model, available) {
   return { name, type, description, model, available };
@@ -33,40 +40,85 @@ export default function Resources() {
   const [resources, setResources] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [alertIsOpen, setAlertIsOpen] = useState(false);
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
 
-  const[name, setName] = useState('');
-  const[type, setType] = useState('');
-  const[description, setDescription] = useState('');
-  const[model, setModel] = useState('');
+  const [name, setName] = useState('');
+  const [type, setType] = useState('');
+  const [description, setDescription] = useState('');
+  const [model, setModel] = useState('');
+  const [available, setAvailable] = useState('');
+
+  const [resourceIndex, setresourceIndex] = useState(-1);
 
   useEffect(() => {
     setResources(rows);
   }, []);
 
   function handleSubmit() {
-    setResources([
-      ...resources,
-      {
+    if (resourceIndex !== -1) {
+      let updatedResources = resources;
+      updatedResources[resourceIndex] = {
         name,
         type,
         description,
         model,
-        available: 'Sim',
-      }
-    ]);
+        available,
+      };
 
+      setResources(updatedResources);
+    } else {
+      setResources([
+        ...resources,
+        {
+          name,
+          type,
+          description,
+          model,
+          available: available || 'Sim',
+        }
+      ]);
+
+      setAlertIsOpen(true);
+    }
+
+    handleCloseModal();
+  }
+
+  function handleCloseAlert() {
+    setAlertIsOpen(false);
+  }
+
+  function handleDelete() {
+    let updatedResources = resources;
+    updatedResources.splice(resourceIndex, 1);
+
+    setResources(updatedResources);
+    handleCloseDialog();
+  }
+
+  function handleCloseDialog() {
+    setDialogIsOpen(false);
+    setresourceIndex(-1);
+  }
+
+  function handleEdit(name, type, description, model, available) {
+    setName(name);
+    setType(type);
+    setDescription(description);
+    setModel(model);
+    setAvailable(available);
+    setModalIsOpen(true);
+  }
+
+  function handleCloseModal() {
     setName('');
     setType('');
     setDescription('');
     setModel('');
+    setAvailable('');
 
     setModalIsOpen(false);
-    setAlertIsOpen(true);
-  }
-
-  function handleCloseAlert() {
-    console.log('passei aqui');
-    setAlertIsOpen(false);
+    setresourceIndex(-1);
   }
 
   return (
@@ -102,30 +154,43 @@ export default function Resources() {
           </TableHead>
 
           <TableBody>
-          {resources.map((row) => (
-            <TableRow
-              key={row.name}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell align="center">{row.type}</TableCell>
-              <TableCell align="center">{row.description}</TableCell>
-              <TableCell align="center">{row.model}</TableCell>
-              <TableCell align="center">{row.available}</TableCell>
-              <TableCell align="center">
-                <Button>
-                  <DeleteOutline color='error' />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
+          {resources.map((row, index) => {
+            const { name, type, description, model, available } = row;
+
+            return (
+              <TableRow
+                key={name}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  {name}
+                </TableCell>
+                <TableCell align="center">{type}</TableCell>
+                <TableCell align="center">{description}</TableCell>
+                <TableCell align="center">{model}</TableCell>
+                <TableCell align="center">{available}</TableCell>
+                <TableCell align="center">
+                <Button onClick={() => {
+                  setresourceIndex(index);
+                  handleEdit(name, type, description, model, available);
+                }}>
+                    <ModeEditOutline />
+                  </Button>
+                  <Button onClick={() => {
+                    setresourceIndex(index);
+                    setDialogIsOpen(true);
+                  }}>
+                    <DeleteOutline color='error' />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            )
+          })}
           </TableBody>
         </Table>
       </TableContainer>
 
-      <Modal open={modalIsOpen} onClose={() => setModalIsOpen(false)}>
+      <Modal open={modalIsOpen} onClose={handleCloseModal}>
         <Box
           sx={{
             position: 'absolute',
@@ -185,6 +250,20 @@ export default function Resources() {
               fullWidth
             />
           </Grid>
+          {available && (
+            <Grid item>
+             <InputLabel id="available">Disponível</InputLabel>
+            <Select
+              labelId="available"
+              value={available}
+              label="Available"
+              onChange={(e) => setAvailable(e.target.value)}
+            >
+              <MenuItem value='Sim'>Sim</MenuItem>
+              <MenuItem value='Não'>Não</MenuItem>
+            </Select>
+            </Grid>
+          )}
           <Grid item>
             <Button fullWidth variant="contained" onClick={handleSubmit}>Cadastrar</Button>
           </Grid>
@@ -200,6 +279,19 @@ export default function Resources() {
           Cadastrado com sucesso!
         </Alert>
       </Snackbar>
+      <ConfirmModal
+        isOpen={dialogIsOpen}
+        onClose={handleCloseDialog}
+        description="Deseja mesmo apagar este recurso?"
+        actions={
+          <>
+            <Button onClick={handleCloseDialog}>Cancelar</Button>
+            <Button onClick={handleDelete} autoFocus>
+              Apagar
+            </Button>
+          </>
+        }
+      />
     </Layout>
   )
 }
