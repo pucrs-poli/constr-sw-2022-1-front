@@ -16,10 +16,6 @@ import {
   Grid,
   Snackbar,
   Alert,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  DialogContentText,
   InputLabel,
   Select,
   MenuItem,
@@ -265,7 +261,9 @@ export default function Resources() {
             </Grid>
           )}
           <Grid item>
-            <Button fullWidth variant="contained" onClick={handleSubmit}>Cadastrar</Button>
+            <Button fullWidth variant="contained" onClick={handleSubmit}>
+              {resourceIndex !== -1 ? 'Atualizar' : 'Cadastrar'}
+            </Button>
           </Grid>
         </Grid>
         </Box>
