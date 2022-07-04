@@ -47,6 +47,7 @@ const rows = [
 export default function Reservations() {
   return (
     <>
+      <CustomAppBar title="Construção de Software" />
       <Layout>
           <TableContainer component={Paper}>
           <Table sx={{ minWidth: 100 }} size="small" aria-label="a dense table">
