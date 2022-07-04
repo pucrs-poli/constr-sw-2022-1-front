@@ -99,13 +99,33 @@ export default function EditStudent(props) {
 
     classesRepository.fetchClassById(router.query.classId).then(responseData => {
       disciplinesRepository.fetchById(responseData.id_discipline).then(discData => {
+        const clazz = new ClassModel();
+        clazz.id = responseData.class_id;
+        clazz.year = responseData.year;
+        clazz.semester = responseData.semester;
+
+        const teacher = mockTeachersData.find(teach => teach.id == responseData.id_user);
+
+        const schedules = responseData.schedules.map(sch => {
+          const schedule = new ScheduleModel();
+          schedule.id = sch.schedule_id;
+          schedule.hour = sch.hour;
+
+          return schedule;
+        });
+
+        const discipline = new DisciplineModel();
+        discipline.id = discData.id;
+        discipline.name = discData.nome;
+
+        clazz.schedules = schedules;
+
+        setDisciplineData(discipline);
+        setClassData(clazz);
+        setTeacherData(teacher);
+        setSchedulesData(schedules);
+
         studentsRepository.fetchAll().then(stData => {
-
-          const clazz = new ClassModel();
-          clazz.id = responseData.class_id;
-          clazz.year = responseData.year;
-          clazz.semester = responseData.semester;
-
           const students = responseData.students.map(s => {
             const student = new StudentModel();
             student.id = s.student_id;
@@ -114,20 +134,6 @@ export default function EditStudent(props) {
 
             return student;
           });
-
-          const teacher = mockTeachersData.find(teach => teach.id == responseData.id_user);
-
-          const schedules = responseData.schedules.map(sch => {
-            const schedule = new ScheduleModel();
-            schedule.id = sch.schedule_id;
-            schedule.hour = sch.hour;
-
-            return schedule;
-          });
-
-          const discipline = new DisciplineModel();
-          discipline.id = discData.id;
-          discipline.name = discData.nome;
 
           const foundStudents = stData.filter(s => !students.find(s2 => s2.id == s.student_id)).map(d => {
             const s = new StudentModel();
@@ -139,15 +145,13 @@ export default function EditStudent(props) {
             return s;
           });
 
-          clazz.schedules = schedules;
           clazz.students = students;
 
-          setDisciplineData(discipline);
-          setAllStudents(foundStudents);
           setClassData(clazz);
           setStudentsData(students);
-          setTeacherData(teacher);
-          setSchedulesData(schedules);
+          setAllStudents(foundStudents);
+        }).catch(() =>{
+          setStudentsData([]);
         });
       });
     });
