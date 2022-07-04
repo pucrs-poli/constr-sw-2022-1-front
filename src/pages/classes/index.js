@@ -150,7 +150,6 @@ export default function ListClasses(props) {
           />
         </Grid>
       </Container>
-      {/* {this.modal()} */}
     </>
   );
 
