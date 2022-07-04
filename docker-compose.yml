@@ -1,7 +1,19 @@
-version: '3.4'
+version: '3.7'
 networks:
   constrsw:
 services:
+  # app:
+  #   container_name: react-app
+  #   build:
+  #       context: .
+  #       dockerfile: Dockerfile
+  #   volumes:
+  #       - '.:/app'
+  #       - '/app/node_modules'
+  #   ports:
+  #       - '3001:3000'
+  #   environment:
+  #       - NODE_ENV=development
   mongodb:
     container_name: mongodb
     image: mongo:latest
