@@ -16,7 +16,7 @@ export default class CustomDataTable extends React.Component {
 
     render() {
         return (
-            <Grid item md={10}>
+            <Grid item md={12}>
                 {this.customDataTableHeader()}
                 {/* Dados */}
                 <Grid item md={12}>

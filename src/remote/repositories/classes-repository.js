@@ -79,4 +79,8 @@ export class ClassesRepository {
     addScheduleToClass = async (classId, schedule = new ScheduleRemoteModel()) => {
         return customAxios.post(`${nextConfig.env.CLASSES_API_BASE_URL}/classes/${classId}/schedules`, schedule);
     }
+
+    deleteClass = async (classId) => {
+        return customAxios.delete(`${nextConfig.env.CLASSES_API_BASE_URL}/classes/${classId}`);
+    }
 }

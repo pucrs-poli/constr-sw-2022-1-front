@@ -26,7 +26,7 @@ export default function ConfirmDeleteModal(props) {
 
     return (
         <div>
-            <Button onClick={handleOpen}><DeleteIcon /></Button>
+            <Button onClick={handleOpen}><DeleteIcon  color='error'/></Button>
             <Modal
                 open={open}
                 onClose={handleClose}

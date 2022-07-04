@@ -1,68 +1,104 @@
-import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Container, Divider, Grid } from '@mui/material';
-import React from 'react';
+import { Button, Container, Grid } from '@mui/material';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
+import CustomAppBar from '../../components/CustomAppBar';
 import CustomDataTable from '../../components/data-table/CustomDataTable';
+import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
+import StudentModel from '../../models/Student';
+import StudentsRepository from '../../remote/repositories/students-repository';
 
-export default class ListStudents extends React.Component {
+export default function ListClasses(props) {
+  const router = useRouter();
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      opened: false,
+  const [modalState, setModalState] = useState({
+    opened: false,
+  });
+
+  const [studentsData, setStudentsData] = useState([new StudentModel()]);
+
+  const studentsRepository = new StudentsRepository();
+
+  useEffect(() => {
+    if (!router.isReady) {
+      return;
     }
-    this.mockData = [
-      {
-        id: '098',
-        enrollment: '16204179',
-        name: 'Rodrigo Machado'
-      },
-      {
-        id: '123',
-        enrollment: '16204042',
-        name: 'Kevin'
-      }
-    ];
+    studentsRepository.fetchAll().then(allstudents => {
+      const students = allstudents.map(st => {
+        return {
+          id: st.student_id,
+          name: st.name,
+          enrollment: st.enrollment
+        }
+      });
+
+      setStudentsData(students);
+    });
+
+  }, [router.isReady]);
+
+  const handleOpen = () => {
+    setModalState({
+      opened: true
+    });
   }
 
-  render = () => (
+  const deleteStudent = (studentId) => {
+    studentsRepository.deleteStudent(studentId).then(() => {
+      const studentsWithoutDeleted = studentsData.filter(st => st.id != studentId);
+
+      setStudentsData(studentsWithoutDeleted);
+    });
+  }
+
+  return (
     <>
+      <CustomAppBar title="Construção de Software" />
       <Container>
-        <Divider />
-        <Grid container marginTop={'20px'} >
+        <Grid item sm={12} marginTop={'5rem'} marginBottom={'5rem'}>
+          <Grid item sm={12} sx={{ marginTop: '10px', textAlign: 'right' }}>
+            <Button variant="contained" onClick={() => router.push('/students/new')}>Cadastrar novo aluno</Button>
+          </Grid>
+        </Grid>
+        <Grid container marginTop={'20px'}>
           <CustomDataTable
-            margin={'auto'}
-            handleOpen={this.handleOpen}
+            handleOpen={handleOpen}
             headers={[
-              {
-                title: 'Matrícula',
-                columnSize: 2
-              },
               {
                 title: 'Nome',
                 columnSize: 8
               },
               {
+                title: 'Matrícula',
+                columnSize: 3
+              },
+              {
                 title: 'Ações',
-                columnSize: 2,
+                columnSize: 1
               }
             ]}
             bodyItems={
-              this.mockData.map(d => {
+              studentsData.map(d => {
                 return {
-                  imagePath: d.imagePath,
+                  imagePath: 'frontend.png',
                   bodyItemTexts: [
-                    d.enrollment,
                     d.name,
+                    d.enrollment,
                     <Grid container>
                       <Grid item md={6}>
                         <a href={`/students/${d.id}`}>
-                          <EditIcon />
+                          <EditIcon sx={{ color: '#1976d2' }} />
                         </a>
                       </Grid>
                       <Grid item md={6} sx={{ cursor: 'pointer' }}>
-                        <DeleteIcon />
+                        <ConfirmDeleteModal title={`Excluir aluno`} description={
+                          <span>
+                            <span>Deseja realmente excluir o aluno {d.name}?</span>
+                          </span>
+                        }
+                          positiveCallback={() => deleteStudent(d.id)}
+                          positiveActionText={'Excluir'} />
                       </Grid>
                     </Grid>
                   ]
@@ -72,7 +108,6 @@ export default class ListStudents extends React.Component {
           />
         </Grid>
       </Container>
-      {/* {this.modal()} */}
     </>
   );
 

@@ -1,11 +1,11 @@
-import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Button, Container, Grid, Typography } from '@mui/material';
+import { Button, Container, Grid } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import CustomAppBar from '../../components/CustomAppBar';
 import CustomDataTable from '../../components/data-table/CustomDataTable';
+import ConfirmDeleteModal from '../../components/modals/ConfirmDeleteModal';
 import ClassModel from '../../models/Class';
 import { ClassesRepository } from '../../remote/repositories/classes-repository';
 import { DisciplinesRepository } from '../../remote/repositories/disciplines-repository';
@@ -62,7 +62,7 @@ export default function ListClasses(props) {
           clazz.discipline = !!foundDiscipline ? {
             id: foundDiscipline.id,
             name: foundDiscipline.nome
-          } : null;
+          } : {};
 
           clazz.teacher = mockTeachersData.find(tech => tech.id === cl.id_user);
 
@@ -81,6 +81,14 @@ export default function ListClasses(props) {
     });
   }
 
+  const deleteClass = (classId) => {
+    classesRepository.deleteClass(classId).then(() => {
+      const classesWithoutDeleted = classesData.filter(cl => cl.id != classId);
+
+      setClassesData(classesWithoutDeleted);
+    });
+  }
+
   return (
     <>
       <CustomAppBar title="Construção de Software" />
@@ -90,15 +98,7 @@ export default function ListClasses(props) {
             <Button variant="contained" onClick={() => router.push('/classes/new')}>Criar nova turma</Button>
           </Grid>
         </Grid>
-        <Grid container marginTop={'20px'}>
-          {/* Filtro de horário */}
-          <Grid item md={2}>
-            <Grid item marginTop={'20px'}>
-              <Typography color="inherit" component="div" fontSize={'12pt'}>
-                Horário
-              </Typography>
-            </Grid>
-          </Grid>
+        <Grid container>
           <CustomDataTable
             handleOpen={handleOpen}
             headers={[
@@ -133,8 +133,14 @@ export default function ListClasses(props) {
                           <EditIcon sx={{ color: '#1976d2' }} />
                         </a>
                       </Grid>
-                      <Grid item md={6} sx={{ cursor: 'pointer' }}>
-                        <DeleteIcon sx={{ color: 'red' }} />
+                      <Grid item md={6} sx={{ cursor: 'pointer' }} >
+                        <ConfirmDeleteModal title={`Excluir turma`} description={
+                          <span>
+                            <span>Deseja realmente excluir a turma de {d.discipline.name}?</span>
+                          </span>
+                        }
+                          positiveCallback={() => deleteClass(d.id)}
+                          positiveActionText={'Excluir'} />
                       </Grid>
                     </Grid>
                   ]

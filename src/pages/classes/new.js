@@ -10,7 +10,7 @@ import ClassModel from '../../models/Class';
 import StudentModel from '../../models/Student';
 import { ClassesRepository } from '../../remote/repositories/classes-repository';
 import { DisciplinesRepository } from '../../remote/repositories/disciplines-repository';
-import { StudentsRepository } from '../../remote/repositories/students-repository';
+import StudentsRepository from '../../remote/repositories/students-repository';
 
 export default function AddStudent(props) {
     const classesRepository = new ClassesRepository();

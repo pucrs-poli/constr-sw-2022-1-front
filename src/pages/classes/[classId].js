@@ -12,7 +12,7 @@ import ScheduleModel from '../../models/Schedule';
 import StudentModel from '../../models/Student';
 import { ClassesRepository } from '../../remote/repositories/classes-repository';
 import { DisciplinesRepository } from '../../remote/repositories/disciplines-repository';
-import { StudentsRepository } from '../../remote/repositories/students-repository';
+import StudentsRepository from '../../remote/repositories/students-repository';
 
 export default function EditStudent(props) {
   const router = useRouter();
@@ -338,7 +338,6 @@ export default function EditStudent(props) {
             </Typography>
 
           </Grid>
-          <Grid></Grid>
           <Grid item sm={12} margin={'10px'}>
             <InputLabel id="id-teacher">Professor</InputLabel>
 
