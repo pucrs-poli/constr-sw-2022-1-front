@@ -1,4 +1,4 @@
-const CustomLine = ({onClick, title, curriculo, cursos}) => { 
+const CustomLine = ({onClick, title, field1, field2}) => { 
   return (
     <button 
       style={{
@@ -13,8 +13,8 @@ const CustomLine = ({onClick, title, curriculo, cursos}) => {
         justifyContent: "space-between"
       }}>
         <h3>{title}</h3>
-        <h4>{curriculo}</h4>
-        <h4>{cursos}</h4>
+        <h4>{field1}</h4>
+        <h4>{field2}</h4>
       </span>
     </button>
   );

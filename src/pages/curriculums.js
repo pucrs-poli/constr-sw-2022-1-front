@@ -8,6 +8,7 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { TextField } from "@mui/material";
+import CustomAppBar from '../components/CustomAppBar'
 
 const style = {
   position: 'absolute',
@@ -22,70 +23,147 @@ const style = {
 };
 
 const theme = createTheme();
-
+let idCount = 2
 let curriculosMock = [
   {
-    "id":"999",
-    "nome":"curriculo 1"
-  },
-  {
-    "id":"998",
-    "nome":"curriculo 2"
-  },{
-    "id":"997",
-    "nome":"curriculo 3"
+    "id": "1",
+    "nome": "98AL"
   }
+]
+
+const mockDisciplinas = [
+  {
+    "id": 1,
+    "codigo": 98903,
+    "creditos": 2,
+    "nome": "Processos de Software",
+    "objetivo": "Aprender sobre processos de software",
+    "ementa": "Ementa da disciplina",
+    "nivel": 5,
+    "ativa": true
+  },{
+    "id": 2,
+    "codigo": 98902,
+    "creditos": 2,
+    "nome": "Banco de Dados II",
+    "objetivo": "Aprender modelagem de banco de dados",
+    "ementa": "Ementa da disciplina",
+    "nivel": 3,
+    "ativa": true
+  },{
+    "id": 3 ,
+    "codigo": 95300,
+    "creditos": 4,
+    "nome": "Calculo I",
+    "objetivo": "Ementa da disciplina",
+    "ementa": "lorem ipsum",
+    "nivel": 3,
+    "ativa": true
+  }
+
 ]
 
 export default function Curriculums() {
 
   const [curriculos, setCurriculos] = React.useState(curriculosMock)
+  const [disciplinas, setDisciplinas] = React.useState(mockDisciplinas)
 
   const [addCurriculums, setAddCurriculums] = React.useState(false)
+  const [showCurriculums, setShowCurriculums] = React.useState(false)
+  const [editCurriculum, setEditCurriculum] = React.useState(false)
+
   const handleAddCurriculumsOpen = () => setAddCurriculums(true)
   const handleAddCurriculumsClose = () => setAddCurriculums(false)
 
+
+
+  function handleShowCurriculumsOpen(id) {
+    const curriculum = curriculos.find(curriculo => curriculo.id === id)
+    if (curriculum) {
+      setCurriculumsName(curriculum.nome)
+      setCurriculumsId(curriculum.id)
+    }
+
+    setShowCurriculums(true)
+  }
+
+  function handleShowCurriculumsClose() {
+    setShowCurriculums(false)
+    limparCampos()
+  }
+  function handleEditCurriculumsOpen(id) {
+    setShowCurriculums(false)
+    setEditCurriculum(true)
+  }
+
+  function handleEditCurriculumsClose() {
+    setEditCurriculum(false)
+    limparCampos()
+  }
+
   const [curriculumsName, setCurriculumsName] = React.useState('');
-  const [curriculumsId, setCurriculumsId] = React.useState('');
+  const [curriculumsId, setCurriculumsId] = React.useState("")
 
   function adicionarCurriculo() {
     //tem que usar state pra atualizar o front
     const novoCurriculo = {
-      "id": curriculumsId,
-      "nome": curriculumsName    
+      "id": idCount++,
+      "nome": curriculumsName
     }
-  
-    setCurriculos([...curriculos,novoCurriculo])
+
+    setCurriculos([...curriculos, novoCurriculo])
     setAddCurriculums(false)
-    setCurriculumsName("")
-    setCurriculumsId("")
+    limparCampos()
     //limpar campos do curriculo
   }
 
-  function adicionarCurriloOld() {
-    //tem que usar state pra atualizar o front
-    curriculos.push(
-      {
-        "id":"996",
-        "nome":"curriculo 4"
+  function editarCurriculo() {
+    const curriculo = curriculos.find(curri => curri.id === curriculumsId)
+
+    curriculo.nome = curriculumsName
+
+    const curriculumsEdit = curriculos
+    curriculumsEdit.forEach(curr => {
+      if(curr.id === curriculo.id) {
+        curr = curriculo
       }
-    )
+    })
+
+    setCurriculos(curriculumsEdit)
+    setEditCurriculum(false)
+    limparCampos()
+  }
+
+  function removerCurriculo(){
+    //TODO chamar endpoint de remocao, mas por enquanto só retira do array mocado
+    const curriculumsEdit = curriculos
+    const index = curriculos.findIndex(curr => curr.id === curriculumsId)
+    curriculumsEdit.splice(index,1)
+
+    setCurriculos(curriculumsEdit)
+    setShowCurriculums(false)
+    limparCampos()
+  }
+
+  function limparCampos() {
+    setCurriculumsName("")
   }
 
   return <>
-      <ThemeProvider theme={theme}>
-        <Container component="main">
+    <ThemeProvider theme={theme}>
+      <CustomAppBar title="Construção de software" />
+      <Container component="main">
         <Button onClick={handleAddCurriculumsOpen}>Cadastrar curriculo</Button>
 
         <Grid container>
 
           {
-            curriculos.map(function(curriculo, index){
+            curriculos.map(function (curriculo, index) {
               return (
                 <>
-                <Grid item key={index}> 
-                  <CustomBox onClick={()=>alert(curriculo.nome)} title={curriculo.nome} description={curriculo.id}/>
-                </Grid>
+                  <Grid item key={index}>
+                    <CustomBox onClick={() =>handleShowCurriculumsOpen(curriculo.id)} title={curriculo.nome} description={curriculo.id} />
+                  </Grid>
                 </>
               )
             })
@@ -94,28 +172,72 @@ export default function Curriculums() {
         </Grid>
 
         <Modal
-              open={addCurriculums}
-              onClose={handleAddCurriculumsClose}
-              aria-labelledby="modal-modal-title"
-              aria-describedby="modal-modal-description"
-            >
-              <Box sx={style}>
-                <Typography id="modal-modal-title" variant="h5" component="h2">
-                  Adicionar um curriculo
-                </Typography>
-                <TextField id="id" name="id" label="Id do curriculo" variant="standard" value={curriculumsId}
-                  onChange={(e) => setCurriculumsId(e.target.value)}/>
-                <TextField id="name" name="name" label="Nome do curriculo" variant="standard" value={curriculumsName}
-                  onChange={(e) => setCurriculumsName(e.target.value)}/>
-                {/* codigo, creditos, nome, objetivo, ementa, nivel, ativa */}
+          open={addCurriculums}
+          onClose={handleAddCurriculumsClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h5" component="h2">
+              Adicionar um curriculo
+            </Typography>
+            <TextField id="name" name="name" label="Nome do curriculo" variant="standard" value={curriculumsName}
+              onChange={(e) => setCurriculumsName(e.target.value)} />
 
-                <Button onClick={adicionarCurriculo}>Cadastrar Curriculo</Button>
-              </Box>
-                
+            <Button onClick={adicionarCurriculo}>Cadastrar Curriculo</Button>
+          </Box>
+
         </Modal>
 
-        </Container>
+        <Modal //show curriculo
+          open={showCurriculums}
+          onClose={handleShowCurriculumsClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h5" component="h2">
+              {curriculumsName}
+            </Typography>
+            {
+              disciplinas.map((disciplina, index) => 
+                <Typography key={disciplina.id} id="modal-modal-title" variant="h6" component="h6">{disciplina.nome} | nivel: {disciplina.nivel} | codigo: {disciplina.codigo}-{disciplina.creditos} </Typography>
+              )
+            }
 
-      </ThemeProvider> 
+            <Button onClick={handleEditCurriculumsOpen}>Editar curriculo</Button>
+            <Button onClick={removerCurriculo}>Remover curriculo</Button>
+          </Box>
+
+        </Modal>
+
+        <Modal //edit curriculo
+          open={editCurriculum}
+          onClose={handleEditCurriculumsClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h5" component="h2">
+              Editar curriculo
+            </Typography>
+            <TextField id="name" name="name" label="Nome do curriculo" variant="standard" value={curriculumsName}
+              onChange={(e) => setCurriculumsName(e.target.value)} />
+            {
+              disciplinas.map((disciplina, index) => 
+                <Typography key={disciplina.id} id="modal-modal-title" variant="h6" component="h6">{disciplina.nome} | nivel: {disciplina.nivel} | codigo: {disciplina.codigo}-{disciplina.creditos} </Typography>
+              )
+            }
+            {/* <TextField id="name" name="name" label="Nome do curriculo" variant="standard" value={curriculumsName}
+              onChange={(e) => setCurriculumsName(e.target.value)} /> */}
+
+            <Button onClick={editarCurriculo}>Salvar</Button>
+          </Box>
+
+        </Modal>
+
+      </Container>
+
+    </ThemeProvider>
   </>
 }
